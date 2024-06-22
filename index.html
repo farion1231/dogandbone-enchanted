@@ -13,6 +13,7 @@
         }
         #gameCanvas {
             border: 1px solid black;
+            touch-action: none;
         }
         #score, #missedBones {
             position: absolute;
@@ -117,15 +118,10 @@
         let dogs = [];
         let bones = [];
 
-        function getRandomColor() {
-            const r = Math.floor(Math.random() * 200) + 55;
-            const g = Math.floor(Math.random() * 200) + 55;
-            const b = Math.floor(Math.random() * 200) + 55;
-            return `rgb(${r},${g},${b})`;
-        }
+        const DOG_COLOR = '#FFA500'; // 橘黄色
 
         function drawDog(dog) {
-            ctx.fillStyle = dog.color;
+            ctx.fillStyle = DOG_COLOR;
             
             // 绘制狗的身体
             ctx.beginPath();
@@ -299,7 +295,7 @@
                 y: canvasHeight / 2,
                 width: 50,
                 height: 30,
-                color: getRandomColor(),
+                color: DOG_COLOR,
                 targetY: canvasHeight / 2
             }];
             bones = [];
@@ -327,11 +323,22 @@
 
         window.addEventListener('resize', resizeCanvas);
 
-        document.addEventListener('mousemove', (e) => {
+        function updateDogPosition(y) {
             if (!isAutoMode && isGameRunning) {
-                const mouseY = e.clientY;
-                dogs[0].targetY = mouseY - dogs[0].height / 2;
+                dogs[0].targetY = y - dogs[0].height / 2;
             }
+        }
+
+        // 鼠标移动事件
+        document.addEventListener('mousemove', (e) => {
+            updateDogPosition(e.clientY);
+        });
+
+        // 触摸事件
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // 防止滚动
+            const touch = e.touches[0];
+            updateDogPosition(touch.clientY);
         });
 
         autoButton.addEventListener('click', () => {
